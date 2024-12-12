@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ exoplanet.pl_name }} - Details</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ exoplanet.pl_name }}</h1>
+        <p><strong>Planet Letter:</strong> {{ exoplanet.pl_letter }}</p>
+        <p><strong>Object ID:</strong> {{ exoplanet.objectid }}</p>
+        <p><strong>Host ID:</strong> {{ exoplanet.hostid }}</p>
+        <p><strong>Host Star:</strong> {{ exoplanet.hostname }}</p>
+        <p><strong>Discovery Date:</strong> {{ exoplanet.disc_pubdate }}</p>
+        <p><strong>Discovery Year:</strong> {{ exoplanet.disc_year }}</p>
+        <p><strong>Discovery Method:</strong> {{ exoplanet.discoverymethod }}</p>
+        <p><strong>Discovery Locale:</strong> {{ exoplanet.disc_locale }}</p>
+        <p><strong>Discovery Facility:</strong> {{ exoplanet.disc_facility }}</p>
+        <p><strong>Discovery Instrument:</strong> {{ exoplanet.disc_instrument }}</p>
+        <p><strong>Discovery Telescope:</strong> {{ exoplanet.disc_telescope }}</p>
+
+        <a href="/" class="btn btn-primary">Back to List</a>
+    </div>
+</body>
+</html>

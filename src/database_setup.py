@@ -6,14 +6,14 @@ def create_database():
 
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS exoplanets (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        host_star TEXT,
+        objectid INTEGER PRIMARY KEY,
+        pl_name TEXT,
+        hostname TEXT,
         orbital_period REAL,
         mass REAL,
         radius REAL,
         distance REAL,
-        discovery_method TEXT,
+        discoverymethod TEXT,
         discovery_year INTEGER              
     )
    ''')

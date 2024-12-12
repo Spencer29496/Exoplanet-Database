@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exoplanet Database</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Exoplanet Database</h1>
+
+        <form method="get" action="/" class="form-inline mb-3">
+            <input type="text" name="search" class="form-control mr-2" placeholder="Search Exoplanets..." value="{{ search_query }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
+        {{ tables[0]|safe }}
+        
+        <div class="pagination">
+            {{ pagination.links }}
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('td:nth-child(2)').forEach(cell => {
+            const name = cell.textContent.trim();
+            cell.innerHTML = `<a href="/exoplanet/${encodeURIComponent(name)}">${name}</a>`;
+        });
+    </script>
+</body>
+</html>
