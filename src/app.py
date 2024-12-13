@@ -5,7 +5,8 @@ import sqlite3
 
 app = Flask(__name__)
 
-FIELDS = "objectid, pl_name, pl_letter, hostid, hostname, disc_pubdate, disc_year, discoverymethod, disc_locale, disc_facility, disc_instrument, disc_telescope"
+# Include image_url in the selected fields
+FIELDS = "objectid, pl_name, pl_letter, hostid, hostname, disc_pubdate, disc_year, discoverymethod, disc_locale, disc_facility, disc_instrument, disc_telescope, image_url"
 
 def fetch_exoplanets(offset=0, per_page=10, search_query=None):
     conn = sqlite3.connect('exoplanets.db')
@@ -38,14 +39,21 @@ def home():
     
     pagination = Pagination(page=page, per_page=per_page, total=total, css_framework='bootstrap4')
     
+    # Converting dataframe to HTML for display. `escape=False` allows HTML in image_url if needed.
     return render_template('index.html', tables=[exoplanets.to_html(classes='data', index=False, escape=False)], pagination=pagination, search_query=search_query)
 
 @app.route("/exoplanet/<name>")
 def exoplanet_detail(name):
     conn = sqlite3.connect('exoplanets.db')
     query = f"SELECT {FIELDS} FROM exoplanets WHERE pl_name = ?"
-    exoplanet = pd.read_sql_query(query, conn, params=(name,)).iloc[0]
+    df = pd.read_sql_query(query, conn, params=(name,))
     conn.close()
+
+    if df.empty:
+        # Handle the case if no planet found
+        return render_template('detail.html', exoplanet=None)
+
+    exoplanet = df.iloc[0]
     return render_template('detail.html', exoplanet=exoplanet)
 
 if __name__ == "__main__":

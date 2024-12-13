@@ -5,10 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ exoplanet.pl_name }} - Details</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .exoplanet-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>{{ exoplanet.pl_name }}</h1>
+
+        {% if exoplanet.image_url %}
+            <img src="{{ exoplanet.image_url }}" alt="{{ exoplanet.pl_name }} Image" class="exoplanet-image">
+        {% else %}
+            <img src="https://via.placeholder.com/300?text=No+Image+Available" class="exoplanet-image">
+        {% endif %}
+
         <p><strong>Planet Letter:</strong> {{ exoplanet.pl_letter }}</p>
         <p><strong>Object ID:</strong> {{ exoplanet.objectid }}</p>
         <p><strong>Host ID:</strong> {{ exoplanet.hostid }}</p>
@@ -25,3 +39,5 @@
     </div>
 </body>
 </html>
+
+

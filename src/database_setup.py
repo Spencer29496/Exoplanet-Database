@@ -6,17 +6,22 @@ def create_database():
 
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS exoplanets (
-        objectid INTEGER PRIMARY KEY,
+        id INTEGER PRIMARY KEY,
+        objectid TEXT,
         pl_name TEXT,
+        pl_letter TEXT,
+        hostid TEXT,
         hostname TEXT,
-        orbital_period REAL,
-        mass REAL,
-        radius REAL,
-        distance REAL,
+        disc_pubdate TEXT,
+        disc_year INTEGER,
         discoverymethod TEXT,
-        discovery_year INTEGER              
+        disc_locale TEXT,
+        disc_facility TEXT,
+        disc_instrument TEXT,
+        disc_telescope TEXT,
+        image_url TEXT DEFAULT NULL  -- Add this field for image URLs
     )
-   ''')
+    ''')
     
     conn.commit()
     conn.close()
