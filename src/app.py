@@ -2,31 +2,73 @@ from flask import Flask, render_template, request
 from flask_paginate import Pagination, get_page_args
 import pandas as pd
 import sqlite3
+import webbrowser
+import threading
+import time
+import sys
+import os
 
 app = Flask(__name__)
 
-# Include image_url in the selected fields
-FIELDS = "objectid, pl_name, pl_letter, hostid, hostname, disc_pubdate, disc_year, discoverymethod, disc_locale, disc_facility, disc_instrument, disc_telescope, image_url"
+# Fields for the list view (excluding image_url)
+LIST_FIELDS = "objectid, pl_name, pl_letter, hostid, hostname, disc_pubdate, disc_year, discoverymethod, disc_locale, disc_facility, disc_instrument, disc_telescope"
+
+# Fields for the detail view (including image_url)
+DETAIL_FIELDS = "objectid, pl_name, pl_letter, hostid, hostname, disc_pubdate, disc_year, discoverymethod, disc_locale, disc_facility, disc_instrument, disc_telescope, image_url"
 
 def fetch_exoplanets(offset=0, per_page=10, search_query=None):
     conn = sqlite3.connect('exoplanets.db')
+    placeholder_pattern = '%via.placeholder.com%'  # Adjust this if your placeholder URL differs
+
     if search_query:
-        query = f"SELECT {FIELDS} FROM exoplanets WHERE pl_name LIKE ? OR hostname LIKE ? LIMIT ? OFFSET ?"
-        df = pd.read_sql_query(query, conn, params=(f"%{search_query}%", f"%{search_query}%", per_page, offset))
+        query = f"""
+            SELECT {LIST_FIELDS}
+            FROM exoplanets
+            WHERE (pl_name LIKE ? OR hostname LIKE ?)
+              AND image_url IS NOT NULL
+              AND image_url != ''
+              AND image_url NOT LIKE ?
+            LIMIT ? OFFSET ?
+        """
+        df = pd.read_sql_query(query, conn, params=(f"%{search_query}%", f"%{search_query}%", placeholder_pattern, per_page, offset))
     else:
-        query = f"SELECT {FIELDS} FROM exoplanets LIMIT ? OFFSET ?"
-        df = pd.read_sql_query(query, conn, params=(per_page, offset))
+        query = f"""
+            SELECT {LIST_FIELDS}
+            FROM exoplanets
+            WHERE image_url IS NOT NULL
+              AND image_url != ''
+              AND image_url NOT LIKE ?
+            LIMIT ? OFFSET ?
+        """
+        df = pd.read_sql_query(query, conn, params=(placeholder_pattern, per_page, offset))
+    
     conn.close()
     return df
 
 def get_total_count(search_query=None):
     conn = sqlite3.connect('exoplanets.db')
+    placeholder_pattern = '%via.placeholder.com%'  # Adjust this if your placeholder URL differs
+
     if search_query:
-        query = "SELECT COUNT(*) as count FROM exoplanets WHERE pl_name LIKE ? OR hostname LIKE ?"
-        count = pd.read_sql_query(query, conn, params=(f"%{search_query}%", f"%{search_query}%")).iloc[0]['count']
+        query = """
+            SELECT COUNT(*) as count
+            FROM exoplanets
+            WHERE (pl_name LIKE ? OR hostname LIKE ?)
+              AND image_url IS NOT NULL
+              AND image_url != ''
+              AND image_url NOT LIKE ?
+        """
+        count = pd.read_sql_query(query, conn, params=(f"%{search_query}%", f"%{search_query}%", placeholder_pattern)).iloc[0]['count']
     else:
-        query = "SELECT COUNT(*) as count FROM exoplanets"
-        count = pd.read_sql_query(query, conn).iloc[0]['count']
+        query = """
+            SELECT COUNT(*) as count
+            FROM exoplanets
+            WHERE image_url IS NOT NULL
+              AND image_url != ''
+              AND image_url NOT LIKE ?
+        """
+        count = pd.read_sql_query(query, conn, params=(placeholder_pattern,)).iloc[0]['count']
+    
     conn.close()
     return count
 
@@ -39,23 +81,34 @@ def home():
     
     pagination = Pagination(page=page, per_page=per_page, total=total, css_framework='bootstrap4')
     
-    # Converting dataframe to HTML for display. `escape=False` allows HTML in image_url if needed.
     return render_template('index.html', tables=[exoplanets.to_html(classes='data', index=False, escape=False)], pagination=pagination, search_query=search_query)
 
 @app.route("/exoplanet/<name>")
 def exoplanet_detail(name):
     conn = sqlite3.connect('exoplanets.db')
-    query = f"SELECT {FIELDS} FROM exoplanets WHERE pl_name = ?"
+    query = f"SELECT {DETAIL_FIELDS} FROM exoplanets WHERE pl_name = ?"
     df = pd.read_sql_query(query, conn, params=(name,))
     conn.close()
 
     if df.empty:
-        # Handle the case if no planet found
         return render_template('detail.html', exoplanet=None)
 
     exoplanet = df.iloc[0]
     return render_template('detail.html', exoplanet=exoplanet)
 
+def open_browser():
+    """Open the Flask app in the default web browser (Chrome)."""
+    time.sleep(1)  # Give the server a moment to start
+    webbrowser.get("C:/Program Files/Google/Chrome/Application/chrome.exe %s").open_new("http://127.0.0.1:5000/")
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    threading.Thread(target=open_browser).start()
+    try:
+        app.run(debug=True, use_reloader=False)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        # Exit the script when the app stops
+        sys.exit(0)
+
 
