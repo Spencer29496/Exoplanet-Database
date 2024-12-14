@@ -5,62 +5,59 @@ import urllib.parse
 
 def fetch_wikimedia_image_url(planet_name):
     WIKI_API_ENDPOINT = "https://en.wikipedia.org/w/api.php"
-
+    
     def get_image_from_title(title):
         params = {
             "action": "query",
             "titles": title,
-            "prop": "pageimages",
-            "pithumbsize": 600,
+            "prop": "images",
             "format": "json",
             "redirects": 1
         }
         r = requests.get(WIKI_API_ENDPOINT, params=params)
         r.raise_for_status()
         data = r.json()
-
+        
         pages = data.get('query', {}).get('pages', {})
         for pageid, page in pages.items():
-            if pageid == "-1":
-                continue
-            if 'thumbnail' in page:
-                return page['thumbnail']['source']
+            if 'images' in page:
+                for image in page['images']:
+                    image_title = image['title']
+                    if "planet" in image_title.lower() or "exoplanet" in image_title.lower() or "artist's impression" in image_title.lower():
+                        return get_image_url(image_title)
         return None
 
-    # 1. Direct attempt
+    def get_image_url(image_title):
+        params = {
+            "action": "query",
+            "titles": image_title,
+            "prop": "imageinfo",
+            "iiprop": "url",
+            "format": "json"
+        }
+        r = requests.get(WIKI_API_ENDPOINT, params=params)
+        r.raise_for_status()
+        data = r.json()
+        
+        pages = data.get('query', {}).get('pages', {})
+        for page in pages.values():
+            return page['imageinfo'][0]['url'] if 'imageinfo' in page else None
+        return None
+
+    # Direct attempt
     direct_image = get_image_from_title(planet_name)
     if direct_image:
         return direct_image
 
-    # 2. Try stripped name (remove trailing " b" or similar)
+    # Try stripped name
     stripped_name = planet_name.replace(" b", "").strip()
     if stripped_name != planet_name:
         stripped_image = get_image_from_title(stripped_name)
         if stripped_image:
             return stripped_image
 
-    # 3. Search if direct fails
-    search_params = {
-        "action": "query",
-        "list": "search",
-        "srsearch": planet_name,
-        "format": "json",
-        "srlimit": 1
-    }
-    sr = requests.get(WIKI_API_ENDPOINT, params=search_params)
-    sr.raise_for_status()
-    search_data = sr.json()
-
-    search_results = search_data.get('query', {}).get('search', [])
-    if search_results:
-        best_match_title = search_results[0]['title']
-        search_image = get_image_from_title(best_match_title)
-        if search_image:
-            return search_image
-
-    # 4. No image found
+    # No image found
     return f"https://via.placeholder.com/300?text={urllib.parse.quote(planet_name)}+Image+Not+Found"
-
 
 def import_data(csv_file='nasa_exoplanet_data.csv'):
     # Read CSV into DataFrame
