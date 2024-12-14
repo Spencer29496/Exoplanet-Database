@@ -23,6 +23,12 @@
             <img src="https://via.placeholder.com/300?text=No+Image+Available" class="exoplanet-image">
         {% endif %}
 
+        {% if exoplanet.description and exoplanet.description.strip() %}
+            <p><strong>Description:</strong> {{ exoplanet.description }}</p>
+        {% else %}
+            <p><strong>Description:</strong> No description available.</p>
+        {% endif %}
+
         <p><strong>Planet Letter:</strong> {{ exoplanet.pl_letter }}</p>
         <p><strong>Object ID:</strong> {{ exoplanet.objectid }}</p>
         <p><strong>Host ID:</strong> {{ exoplanet.hostid }}</p>
@@ -39,5 +45,3 @@
     </div>
 </body>
 </html>
-
-

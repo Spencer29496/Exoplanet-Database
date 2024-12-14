@@ -42,12 +42,15 @@ def fetch_exoplanets(offset=0, per_page=10, search_query=None):
         """
         df = pd.read_sql_query(query, conn, params=(placeholder_pattern, per_page, offset))
     
+    # Add clickable links for planet names
+    df['pl_name'] = df['pl_name'].apply(lambda name: f'<a href="/exoplanet/{name}">{name}</a>')
+
     conn.close()
     return df
 
 def get_total_count(search_query=None):
     conn = sqlite3.connect('exoplanets.db')
-    placeholder_pattern = '%via.placeholder.com%'  # Adjust this if your placeholder URL differs
+    placeholder_pattern = '%via.placeholder.com%'
 
     if search_query:
         query = """
@@ -98,7 +101,7 @@ def exoplanet_detail(name):
 
 def open_browser():
     """Open the Flask app in the default web browser (Chrome)."""
-    time.sleep(1)  # Give the server a moment to start
+    time.sleep(1)
     webbrowser.get("C:/Program Files/Google/Chrome/Application/chrome.exe %s").open_new("http://127.0.0.1:5000/")
 
 if __name__ == "__main__":
@@ -108,7 +111,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         pass
     finally:
-        # Exit the script when the app stops
         sys.exit(0)
+
 
 

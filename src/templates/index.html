@@ -10,22 +10,22 @@
     <div class="container">
         <h1>Exoplanet Database</h1>
 
-        <form method="get" action="/" class="form-inline mb-3">
+        <form method="get" action="/" class="form-inline mb-3" id="search-form">
             <input type="text" name="search" class="form-control mr-2" placeholder="Search Exoplanets..." value="{{ search_query }}">
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
 
         {{ tables[0]|safe }}
-        
+
         <div class="pagination">
             {{ pagination.links }}
         </div>
     </div>
 
     <script>
-        document.querySelectorAll('td:nth-child(2)').forEach(cell => {
-            const name = cell.textContent.trim();
-            cell.innerHTML = `<a href="/exoplanet/${encodeURIComponent(name)}">${name}</a>`;
+        document.getElementById('search-form').addEventListener('submit', function (e) {
+            const searchInput = document.querySelector('input[name="search"]');
+            searchInput.value = searchInput.value.replace(/\s+/g, '');
         });
     </script>
 </body>
