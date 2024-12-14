@@ -19,7 +19,8 @@ def create_database():
         disc_facility TEXT,
         disc_instrument TEXT,
         disc_telescope TEXT,
-        image_url TEXT DEFAULT NULL  -- Add this field for image URLs
+        image_url TEXT DEFAULT NULL,
+        description TEXT DEFAULT NULL  -- Added description field
     )
     ''')
     

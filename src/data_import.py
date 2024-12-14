@@ -23,7 +23,9 @@ def fetch_wikimedia_image_url(planet_name):
             if 'images' in page:
                 for image in page['images']:
                     image_title = image['title']
-                    if "planet" in image_title.lower() or "exoplanet" in image_title.lower() or "artist's impression" in image_title.lower():
+                    if ("planet" in image_title.lower() or 
+                        "exoplanet" in image_title.lower() or 
+                        "artist's impression" in image_title.lower()):
                         return get_image_url(image_title)
         return None
 
@@ -59,6 +61,25 @@ def fetch_wikimedia_image_url(planet_name):
     # No image found
     return f"https://via.placeholder.com/300?text={urllib.parse.quote(planet_name)}+Image+Not+Found"
 
+
+def fetch_wikipedia_summary(planet_name):
+    # Replace spaces with underscores for Wikipedia titles
+    # For example: "bet Pic b" -> "bet_Pic_b"
+    title = planet_name.replace(" ", "_")
+    url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(title)}"
+    
+    try:
+        r = requests.get(url)
+        if r.status_code == 200:
+            data = r.json()
+            if 'extract' in data:
+                return data['extract']
+        # If page not found or no extract, return None
+        return None
+    except Exception:
+        return None
+
+
 def import_data(csv_file='nasa_exoplanet_data.csv'):
     # Read CSV into DataFrame
     data = pd.read_csv(csv_file)
@@ -66,12 +87,14 @@ def import_data(csv_file='nasa_exoplanet_data.csv'):
     # Fetch image URLs from Wikimedia
     data['image_url'] = data['pl_name'].apply(fetch_wikimedia_image_url)
 
+    # Fetch descriptions from Wikipedia
+    data['description'] = data['pl_name'].apply(fetch_wikipedia_summary)
+
     # Connect to SQLite and write DataFrame
     conn = sqlite3.connect('exoplanets.db')
     data.to_sql('exoplanets', conn, if_exists='replace', index=False)
     conn.close()
-    print("Data imported successfully with Wikimedia image URLs.")
-
+    print("Data imported successfully with Wikimedia image URLs and Wikipedia descriptions.")
 
 if __name__ == "__main__":
     import_data()

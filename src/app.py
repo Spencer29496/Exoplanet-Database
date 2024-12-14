@@ -10,15 +10,15 @@ import os
 
 app = Flask(__name__)
 
-# Fields for the list view (excluding image_url)
+# Fields for the list view (excluding image_url and description)
 LIST_FIELDS = "objectid, pl_name, pl_letter, hostid, hostname, disc_pubdate, disc_year, discoverymethod, disc_locale, disc_facility, disc_instrument, disc_telescope"
 
-# Fields for the detail view (including image_url)
-DETAIL_FIELDS = "objectid, pl_name, pl_letter, hostid, hostname, disc_pubdate, disc_year, discoverymethod, disc_locale, disc_facility, disc_instrument, disc_telescope, image_url"
+# Fields for the detail view (including image_url and description)
+DETAIL_FIELDS = "objectid, pl_name, pl_letter, hostid, hostname, disc_pubdate, disc_year, discoverymethod, disc_locale, disc_facility, disc_instrument, disc_telescope, image_url, description"
 
 def fetch_exoplanets(offset=0, per_page=10, search_query=None):
     conn = sqlite3.connect('exoplanets.db')
-    placeholder_pattern = '%via.placeholder.com%'  # Adjust this if your placeholder URL differs
+    placeholder_pattern = '%via.placeholder.com%'
 
     if search_query:
         query = f"""
@@ -112,6 +112,3 @@ if __name__ == "__main__":
         pass
     finally:
         sys.exit(0)
-
-
-
