@@ -88,16 +88,20 @@ def home():
 
 @app.route("/exoplanet/<name>")
 def exoplanet_detail(name):
+    page = request.args.get('page', 1)
+    search_query = request.args.get('search', '')
+    
     conn = sqlite3.connect('exoplanets.db')
     query = f"SELECT {DETAIL_FIELDS} FROM exoplanets WHERE pl_name = ?"
     df = pd.read_sql_query(query, conn, params=(name,))
     conn.close()
 
     if df.empty:
-        return render_template('detail.html', exoplanet=None)
+        return render_template('detail.html', exoplanet=None, page=page, search=search_query)
 
     exoplanet = df.iloc[0]
-    return render_template('detail.html', exoplanet=exoplanet)
+    return render_template('detail.html', exoplanet=exoplanet, page=page, search=search_query)
+
 
 def open_browser():
     """Open the Flask app in the default web browser (Chrome)."""

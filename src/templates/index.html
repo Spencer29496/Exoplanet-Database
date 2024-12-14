@@ -12,7 +12,8 @@
 
         <form method="get" action="/" class="form-inline mb-3" id="search-form">
             <input type="text" name="search" class="form-control mr-2" placeholder="Search Exoplanets..." value="{{ search_query }}">
-            <button type="submit" class="btn btn-primary">Search</button>
+            <button type="submit" class="btn btn-primary mr-2">Search</button>
+            <a href="/" class="btn btn-secondary">Reset</a>
         </form>
 
         {{ tables[0]|safe }}
@@ -30,4 +31,3 @@
     </script>
 </body>
 </html>
-

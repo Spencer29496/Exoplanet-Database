@@ -41,7 +41,10 @@
         <p><strong>Discovery Instrument:</strong> {{ exoplanet.disc_instrument }}</p>
         <p><strong>Discovery Telescope:</strong> {{ exoplanet.disc_telescope }}</p>
 
-        <a href="/" class="btn btn-primary">Back to List</a>
+        <div class="mt-3">
+            <a href="/" class="btn btn-secondary">Back to Original List</a>
+            <a href="/?page={{ request.args.get('page', 1) }}&search={{ request.args.get('search', '') }}" class="btn btn-primary">Back to Search Results</a>
+        </div>
     </div>
 </body>
 </html>
