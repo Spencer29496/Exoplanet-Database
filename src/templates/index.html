@@ -5,20 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exoplanet Database</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .exoplanet-card {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 200px;
+        }
+        .exoplanet-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            margin-bottom: 10px;
+            background-color: #f0f0f0;
+        }
+        .exoplanet-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Exoplanet Database</h1>
+        <h1 class="my-4 text-center">Exoplanet Database</h1>
 
-        <form method="get" action="/" class="form-inline mb-3" id="search-form">
+        <form method="get" action="/" class="form-inline mb-4 justify-content-center" id="search-form">
             <input type="text" name="search" class="form-control mr-2" placeholder="Search Exoplanets..." value="{{ search_query }}">
             <button type="submit" class="btn btn-primary mr-2">Search</button>
             <a href="/" class="btn btn-secondary">Reset</a>
         </form>
 
-        {{ tables[0]|safe }}
+        <div class="exoplanet-grid">
+            {% for index, row in exoplanets.iterrows() %}
+                <div class="exoplanet-card">
+                    <img src="{{ row['image_url'] if row['image_url'] else 'https://via.placeholder.com/200?text=No+Image' }}" 
+                         alt="{{ row['pl_name'] }} Image" 
+                         class="exoplanet-image">
+                    <h5><a href="{{ row['link'] }}">{{ row['pl_name'] }}</a></h5>
+                </div>
+            {% else %}
+                <p class="text-center">No exoplanets found with valid images.</p>
+            {% endfor %}
+        </div>
 
-        <div class="pagination">
+        <div class="pagination justify-content-center">
             {{ pagination.links }}
         </div>
     </div>
@@ -26,7 +57,7 @@
     <script>
         document.getElementById('search-form').addEventListener('submit', function (e) {
             const searchInput = document.querySelector('input[name="search"]');
-            searchInput.value = searchInput.value.replace(/\s+/g, '');
+            searchInput.value = searchInput.value.trim();
         });
     </script>
 </body>
