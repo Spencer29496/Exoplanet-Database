@@ -8,41 +8,100 @@ WIKI_SUMMARY_ENDPOINT = "https://en.wikipedia.org/api/rest_v1/page/summary/"
 
 def fetch_wikipedia_data(planet_name):
     """
-    Fetches both the summary description and a thumbnail image for the given planet name
-    using the Wikipedia summary endpoint.
+    Fetches both the summary description and a thumbnail image for the given planet name.
     """
-
-    title = planet_name.replace(" ", "_")
+    title = f"{planet_name} (exoplanet)"
     url = f"{WIKI_SUMMARY_ENDPOINT}{urllib.parse.quote(title)}"
 
-    description = None
-    image_url = None
+    description, image_url = None, None
 
     try:
-        print(f"Fetching data from Wikipedia summary for: {planet_name}")
+        print(f"Fetching data from Wikipedia for: {title}")
         r = requests.get(url)
         if r.status_code == 200:
             data = r.json()
-
-            # Extract the description (extract field)
-            if 'extract' in data:
-                description = data['extract']
-
-            # Extract thumbnail image if available
-            if 'thumbnail' in data and 'source' in data['thumbnail']:
-                image_url = data['thumbnail']['source']
-                if image_url.startswith('http://'):
-                    image_url = image_url.replace('http://', 'https://')
-        else:
-            print(f"No Wikipedia page found for {planet_name} (status: {r.status_code}). Using placeholder image.")
+            description = data.get('extract')
+            image_url = data.get('thumbnail', {}).get('source')
     except requests.RequestException as e:
-        print(f"Error fetching Wikipedia summary for {planet_name}: {e}")
+        print(f"Error fetching Wikipedia data for {planet_name}: {e}")
 
-    # Fallback if no image found
+    # Fallback if no specific exoplanet result
+    if not description:
+        print(f"No specific data for {title}, trying general search for: {planet_name}")
+        url = f"{WIKI_SUMMARY_ENDPOINT}{urllib.parse.quote(planet_name)}"
+        try:
+            r = requests.get(url)
+            if r.status_code == 200:
+                data = r.json()
+                description = data.get('extract')
+                image_url = data.get('thumbnail', {}).get('source')
+        except requests.RequestException as e:
+            print(f"Error fetching fallback data for {planet_name}: {e}")
+
+    # Final fallback for the image
     if not image_url:
         image_url = f"https://via.placeholder.com/300?text={urllib.parse.quote(planet_name)}+Image+Not+Found"
 
     return description, image_url
+
+def is_valid_image(image_url):
+    """
+    Checks if the image URL does not contain words related to constellations or diagrams.
+    """
+    exclusion_keywords = [
+        # Common scientific terms
+        "constellation", "diagram", "chart", "map", "illustration", "schematic",
+        "graph", "plot", "curve", "velocity", "spectrum", "spectroscopy",
+        "radial", "doppler", "wavelength", "lightcurve", "transit", "phase",
+        "orbit", "motion", "astrometry", "periodogram", "time-series", "scatter",
+        "lineplot", "histogram", "data", "analysis", "detection", "residual",
+        "contour", "absorption", "emission", "frequency", "simulation", "model",
+        "trajectory", "magnitude", "flux", "intensity", "errorbar", "timescale",
+        "power", "distribution", "hist", "logarithm", "cross-section", "radar",
+        "grid", "waveform", "noise", "precision", "accuracy", "fit", "measurement",
+        "correlation", "calibration", "instrument", "function", "variation", "trend",
+        "spectra", "offset", "axis", "scatterplot", "boxplot", "heatmap", "densityplot",
+        "barplot", "polarplot", "surfaceplot", "diagrammatic", "visualization",
+        "timeline", "fourier", "fft", "kinematics", "dynamics", "signal", "resonance",
+        "phaseplot", "bode", "nyquist", "gain", "impulse", "stepresponse",
+        
+        # Additional visualization and analysis terms
+        "wave", "gridlines", "contourplot", "matrix", "transformation", "vector",
+        "field", "gradient", "isosurface", "topology", "morphology", "scattergram",
+        "trendline", "deviation", "outlier", "confidence", "regression", "fitline",
+        
+        # Physics and astronomy related terms
+        "redshift", "blueshift", "luminosity", "brightness", "magnitude", "lightcurve",
+        "stellar", "orbital", "kinetic", "potential", "gravitational", "acceleration",
+        "astrophysical", "cosmology", "radiation", "fluxdensity", "parallax",
+        
+        # Mathematical terms
+        "derivative", "integral", "functionplot", "parametric", "polar", "cartesian",
+        "complexplane", "vectorfield", "gradientfield", "equationplot", "matrixplot",
+        "tensor", "eigenvalue", "eigenvector", "laplacian", "divergence", "curl",
+        
+        # Generic plot terms
+        "x-axis", "y-axis", "z-axis", "legend", "label", "scale", "ticks", "gridline",
+        "errorbars", "datapoint", "dataset", "fitcurve", "trendcurve", "overlay",
+        
+        # File types and image descriptions
+        "svg", "diagram.jpg", "graph.png", "plot.jpg", "spectrum.png", "curve.png",
+        "velocitygraph", "datagraph", "spectralplot", "motiondiagram", "timediagram",
+        "orbitaldiagram", "analysischart"
+    ]
+    return not any(keyword in image_url.lower() for keyword in exclusion_keywords)
+
+EXCLUDE_TERMS = [
+    "spectroscopy", "TrES-3b", "14 Andromedae b", "OGLE-TR-56b", "18 Delphini b", "55 Cancri d", "TOI-1231 b", "Sun-like", "absolute magnitude"
+]
+
+def should_exclude_description(description):
+    """
+    Returns True if the description contains any of the specified exclusion terms.
+    """
+    if not description:
+        return False
+    return any(term.lower() in description.lower() for term in EXCLUDE_TERMS)
 
 def import_data(csv_file='nasa_exoplanet_data.csv'):
     data = pd.read_csv(csv_file)
@@ -56,21 +115,31 @@ def import_data(csv_file='nasa_exoplanet_data.csv'):
             planet = futures[future]
             try:
                 desc, img = future.result()
-                results[planet] = (desc, img)
+                # Filter criteria:
+                # 1. Description must contain "exoplanet" or "extrasolar."
+                # 2. Description must not contain any of the exclusion terms.
+                # 3. Image URL must not contain keywords related to constellations or diagrams.
+                if (desc and 
+                    ("exoplanet" in desc.lower() or "extrasolar" in desc.lower()) and
+                    not should_exclude_description(desc) and
+                    is_valid_image(img)):
+                    results[planet] = (desc, img)
+                else:
+                    results[planet] = (None, None)  # Exclude if criteria are not met
             except Exception as e:
                 print(f"Error fetching data for {planet}: {e}")
-                # fallback if error
-                results[planet] = (None, f"https://via.placeholder.com/300?text={urllib.parse.quote(planet)}+Image+Not+Found")
+                results[planet] = (None, None)
 
-    # Assign the results to the DataFrame
+    # Filter out rows where description is None (meaning the criteria weren't met)
     data['description'] = data['pl_name'].apply(lambda p: results[p][0])
     data['image_url'] = data['pl_name'].apply(lambda p: results[p][1])
+    data = data.dropna(subset=['description'])
 
     # Connect to SQLite and write DataFrame in a batch
     conn = sqlite3.connect('exoplanets.db')
     data.to_sql('exoplanets', conn, if_exists='replace', index=False, chunksize=1000)
     conn.close()
-    print("Data imported successfully with Wikipedia summary and thumbnail images.")
+    print("Data imported successfully with filtered Wikipedia summaries and thumbnail images.")
 
 if __name__ == "__main__":
     import_data()
