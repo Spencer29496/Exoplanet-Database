@@ -85,13 +85,20 @@ def get_total_count(search_query=None):
 @app.route("/")
 def home():
     search_query = request.args.get('search', '')
-    page, per_page, offset = get_page_args(page_parameter='page', per_page_parameter='per_page', default_per_page=10)
+    page = request.args.get('page', 1, type=int)
+    per_page = 8  # 8 items per page (4 per row * 2 rows)
+    offset = (page - 1) * per_page
+    
     total = get_total_count(search_query)
     exoplanets = fetch_exoplanets(offset=offset, per_page=per_page, search_query=search_query)
-    
+
     pagination = Pagination(page=page, per_page=per_page, total=total, css_framework='bootstrap4')
-    
-    return render_template('index.html', exoplanets=exoplanets, pagination=pagination, search_query=search_query, page = page)
+
+    return render_template('index.html', 
+                           exoplanets=exoplanets, 
+                           pagination=pagination, 
+                           search_query=search_query, 
+                           page=page)
 
 @app.route("/exoplanet/<name>")
 def exoplanet_detail(name):

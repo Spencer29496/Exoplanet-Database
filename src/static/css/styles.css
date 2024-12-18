@@ -1,37 +1,104 @@
+/* Use a space or starfield background */
 body {
-    background: #f8f9fa; /* Light grey background */
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Orbitron', sans-serif;
+    background: #000 url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?fit=crop&w=1950&q=80') no-repeat center center fixed;
+    background-size: cover;
+    color: #fff;
+    margin: 0;
+    padding-top: 56px; /* Height of navbar so content isn't hidden underneath */
 }
 
-h1, h5 {
-    font-weight: 700;
-}
-
-.card {
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-
-/* Customize the navbar brand */
 .navbar-brand {
+    font-weight: 700;
     font-size: 1.5rem;
+}
+
+/* Add a subtle overlay or gradient to help text stand out */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 0;
+}
+
+body {
+    margin: 0;
+    /* Add padding to compensate for the fixed top navbar */
+    padding-top: 56px; /* Adjust based on navbar height */
+}
+
+/* Ensure content is above overlay */
+.container, nav, footer {
+    position: relative;
+    z-index: 2;
+}
+
+/* Page title with a glow effect */
+.page-title {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255,255,255,0.8);
+}
+
+/* Card adjustments */
+.planet-card {
+    border: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: rgba(255,255,255,0.1);
+}
+.planet-card:hover {
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 8px 20px rgba(255,255,255,0.3);
+}
+
+/* Fixed height for images to align properly */
+.fixed-height-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Planet title styling */
+.planet-title {
+    margin-top: 15px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-shadow: 0 0 5px #fff;
+}
+
+/* Glow effect on buttons */
+.glow-button {
+    box-shadow: 0 0 5px #00f, 0 0 20px #00f;
+    border: none;
+    text-transform: uppercase;
     font-weight: bold;
+}
+.glow-button:hover {
+    box-shadow: 0 0 10px #0ff, 0 0 30px #0ff;
+    background-color: #0af;
+}
+
+/* Navbar: Make background transparent and text stand out */
+.navbar {
+    background: rgba(0,0,0,0.7) !important;
+}
+
+/* Pagination styling */
+.pagination a.page-link {
+    color: #fff !important;
+    background: rgba(255,255,255,0.1) !important;
+    border: none !important;
+}
+.pagination a.page-link:hover {
+    background: rgba(255,255,255,0.3) !important;
 }
 
 /* Footer styling */
 footer {
-    position: relative;
-    bottom: 0;
-    width: 100%;
-}
-
-.card-img-top {
-    width: 100%;
-    height: 200px; /* Adjust as needed */
-    object-fit: cover;
-    object-position: center; /* Centers the image within the container */
+    background: rgba(0,0,0,0.7);
+    font-size: 0.9rem;
 }

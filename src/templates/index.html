@@ -1,32 +1,28 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="my-4 text-center">Discover New Worlds</h1>
+<h1 class="my-4 text-center page-title">Discover New Worlds</h1>
 
-<!-- Search form removed here since it's now in the navbar -->
-
-<!-- Grid of exoplanets -->
 <div class="row row-cols-1 row-cols-md-4 g-4">
     {% for index, row in exoplanets.iterrows() %}
     <div class="col">
-      <div class="card h-100 shadow-sm">
+      <div class="card h-100 shadow-sm bg-dark planet-card">
         <img src="{{ row['image_url'] if row['image_url'] else 'https://via.placeholder.com/300?text=No+Image' }}"
-             class="card-img-top" 
+             class="card-img-top fixed-height-img" 
              alt="{{ row['pl_name'] }} Image">
-        <div class="card-body text-center">
-          <h5 class="card-title">{{ row['pl_name'] }}</h5>
+        <div class="card-body text-center text-white">
+          <h5 class="card-title planet-title">{{ row['pl_name'] }}</h5>
           <a href="{{ url_for('exoplanet_detail', name=row['pl_name'], page=page, search=search_query) }}" 
-             class="btn btn-primary btn-sm">View Details</a>
+             class="btn btn-primary btn-sm glow-button">View Details</a>
         </div>
       </div>
     </div>
     {% else %}
     <div class="col-12">
-      <p class="text-center">No exoplanets found with valid images.</p>
+      <p class="text-center text-white">No exoplanets found with valid images.</p>
     </div>
     {% endfor %}
 </div>
 
-<!-- Pagination -->
 <div class="pagination justify-content-center my-4">
     {{ pagination.links }}
 </div>
