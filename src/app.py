@@ -91,20 +91,23 @@ def home():
     
     pagination = Pagination(page=page, per_page=per_page, total=total, css_framework='bootstrap4')
     
-    return render_template('index.html', exoplanets=exoplanets, pagination=pagination, search_query=search_query)
+    return render_template('index.html', exoplanets=exoplanets, pagination=pagination, search_query=search_query, page = page)
 
 @app.route("/exoplanet/<name>")
 def exoplanet_detail(name):
+    page = request.args.get('page', 1, type=int)
+    search_query = request.args.get('search', '')
+
     conn = sqlite3.connect('exoplanets.db')
     query = "SELECT * FROM exoplanets WHERE pl_name = ?"
     df = pd.read_sql_query(query, conn, params=(name,))
     conn.close()
 
     if df.empty:
-        return render_template('detail.html', exoplanet=None)
+        return render_template('detail.html', exoplanet=None, page=page, search_query=search_query)
 
     exoplanet = df.iloc[0]
-    return render_template('detail.html', exoplanet=exoplanet)
+    return render_template('detail.html', exoplanet=exoplanet, page=page, search_query=search_query)
 
 def open_browser():
     time.sleep(1)

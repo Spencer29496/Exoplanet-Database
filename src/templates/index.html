@@ -42,7 +42,9 @@
                     <img src="{{ row['image_url'] if row['image_url'] else 'https://via.placeholder.com/200?text=No+Image' }}" 
                          alt="{{ row['pl_name'] }} Image" 
                          class="exoplanet-image">
-                    <h5><a href="{{ row['link'] }}">{{ row['pl_name'] }}</a></h5>
+                         <h5><a href="{{ url_for('exoplanet_detail', name=row['pl_name'], page=page, search=search_query) }}">
+                            {{ row['pl_name'] }}
+                        </a></h5>                        
                 </div>
             {% else %}
                 <p class="text-center">No exoplanets found with valid images.</p>
