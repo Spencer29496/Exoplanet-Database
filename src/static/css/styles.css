@@ -5,7 +5,8 @@ body {
     background-size: cover;
     color: #fff;
     margin: 0;
-    padding-top: 56px; /* Height of navbar so content isn't hidden underneath */
+    padding-top: 56px; /* for navbar */
+    position: relative; /* ensure positioning context for pseudo-element */
 }
 
 .navbar-brand {
