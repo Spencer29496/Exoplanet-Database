@@ -1,50 +1,45 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ exoplanet.pl_name }} - Details</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .exoplanet-image {
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>{{ exoplanet.pl_name }}</h1>
+{% extends "layout.html" %}
+{% block content %}
+{% if exoplanet %}
+<h1 class="mb-4">{{ exoplanet['pl_name'] }}</h1>
 
-        {% if exoplanet.image_url %}
-            <img src="{{ exoplanet.image_url }}" alt="{{ exoplanet.pl_name }} Image" class="exoplanet-image">
-        {% else %}
-            <img src="https://via.placeholder.com/300?text=No+Image+Available" class="exoplanet-image">
-        {% endif %}
+<div class="text-center mb-4">
+    {% if exoplanet.image_url %}
+        <img src="{{ exoplanet.image_url }}" alt="{{ exoplanet.pl_name }} Image" class="img-fluid rounded shadow">
+    {% else %}
+        <img src="https://via.placeholder.com/300?text=No+Image+Available" class="img-fluid rounded shadow">
+    {% endif %}
+</div>
 
-        {% if exoplanet.description and exoplanet.description.strip() %}
-            <p><strong>Description:</strong> {{ exoplanet.description }}</p>
-        {% else %}
-            <p><strong>Description:</strong> No description available.</p>
-        {% endif %}
+<div class="card p-4 shadow-sm">
+    {% if exoplanet.description and exoplanet.description.strip() %}
+        <p><strong>Description:</strong> {{ exoplanet.description }}</p>
+    {% else %}
+        <p><strong>Description:</strong> No description available.</p>
+    {% endif %}
 
-        <p><strong>Planet Letter:</strong> {{ exoplanet.pl_letter }}</p>
-        <p><strong>Object ID:</strong> {{ exoplanet.objectid }}</p>
-        <p><strong>Host ID:</strong> {{ exoplanet.hostid }}</p>
-        <p><strong>Host Star:</strong> {{ exoplanet.hostname }}</p>
-        <p><strong>Discovery Date:</strong> {{ exoplanet.disc_pubdate }}</p>
-        <p><strong>Discovery Year:</strong> {{ exoplanet.disc_year }}</p>
-        <p><strong>Discovery Method:</strong> {{ exoplanet.discoverymethod }}</p>
-        <p><strong>Discovery Locale:</strong> {{ exoplanet.disc_locale }}</p>
-        <p><strong>Discovery Facility:</strong> {{ exoplanet.disc_facility }}</p>
-        <p><strong>Discovery Instrument:</strong> {{ exoplanet.disc_instrument }}</p>
-        <p><strong>Discovery Telescope:</strong> {{ exoplanet.disc_telescope }}</p>
-
-        <div class="mt-3">
-            <a href="/" class="btn btn-secondary">Reset</a>
-            <a href="/?page={{ page }}&search={{ search_query }}" class="btn btn-primary">Back to List</a>
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Planet Letter:</strong> {{ exoplanet.pl_letter }}</p>
+            <p><strong>Object ID:</strong> {{ exoplanet.objectid }}</p>
+            <p><strong>Host ID:</strong> {{ exoplanet.hostid }}</p>
+            <p><strong>Host Star:</strong> {{ exoplanet.hostname }}</p>
+        </div>
+        <div class="col-md-6">
+            <p><strong>Discovery Date:</strong> {{ exoplanet.disc_pubdate }}</p>
+            <p><strong>Discovery Year:</strong> {{ exoplanet.disc_year }}</p>
+            <p><strong>Discovery Method:</strong> {{ exoplanet.discoverymethod }}</p>
+            <p><strong>Discovery Locale:</strong> {{ exoplanet.disc_locale }}</p>
+            <p><strong>Discovery Facility:</strong> {{ exoplanet.disc_facility }}</p>
+            <p><strong>Discovery Instrument:</strong> {{ exoplanet.disc_instrument }}</p>
         </div>
     </div>
-</body>
-</html>
+</div>
+
+<div class="mt-3">
+    <a href="/?page={{ request.args.get('page', 1) }}&search={{ request.args.get('search', '') }}" class="btn btn-secondary">Back to Search Results</a>
+</div>
+{% else %}
+<p>Exoplanet not found.</p>
+{% endif %}
+{% endblock %}

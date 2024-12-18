@@ -104,9 +104,12 @@ def exoplanet_detail(name):
     conn.close()
 
     if df.empty:
+        # If no data found, pass None to the template
         return render_template('detail.html', exoplanet=None, page=page, search_query=search_query)
+    
+    # Convert the first row of df to a dictionary
+    exoplanet = df.iloc[0].to_dict()
 
-    exoplanet = df.iloc[0]
     return render_template('detail.html', exoplanet=exoplanet, page=page, search_query=search_query)
 
 def open_browser():
