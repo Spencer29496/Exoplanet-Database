@@ -1,0 +1,7 @@
+Flask
+Flask-Paginate
+pandas
+requests
+sqlite3
+urllib3
+concurrent.futures
