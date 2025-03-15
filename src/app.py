@@ -125,6 +125,7 @@ def open_browser():
 
 if __name__ == "__main__":
     # if not in root directory, throw an error
+
     if os.path.dirname(__file__) != os.path.abspath('src'):
         raise ValueError("This script must be run from the root directory, not src/")
     

@@ -41,4 +41,5 @@ if __name__ == "__main__":
         raise ValueError("This script must be run from the root directory, not src/")
     
     print("Downloading NASA exoplanet data...")
+
     download_nasa()
