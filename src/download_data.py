@@ -1,12 +1,21 @@
 import requests
 from tqdm import tqdm
 import os
+import pyfiglet
 
-def download_nasa(output_file = 'src/nasa_exoplanet_data.csv'):
+
+def download_nasa(output_file = 'src/data/nasa_exoplanet_data.csv'):
     url = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+*+from+pscomppars&format=csv"
 
     # Use stream=True to download in chunks
     print(f"Downloading data from {url} to {output_file}")
+    
+    # if no data directory, create it
+    if not os.path.exists('src/data'):
+        print("No data directory found, creating it...")
+        os.makedirs('src/data')
+        print("Data directory created successfully.")
+
     response = requests.get(url, stream=True)
 
     if response.status_code == 200:
@@ -24,6 +33,9 @@ def download_nasa(output_file = 'src/nasa_exoplanet_data.csv'):
         print(f"Failed to download data. Status code: {response.status_code}")
 
 if __name__ == "__main__":
+    # print ascii art
+    print(pyfiglet.figlet_format("HI I'M SPENCER"))
+    print(pyfiglet.figlet_format("Exoplanet Data Downloader"))
     # if not in root directory, throw an error
     if os.path.dirname(__file__) != os.path.abspath('src'):
         raise ValueError("This script must be run from the root directory, not src/")

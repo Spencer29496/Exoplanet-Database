@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import os
 
 WIKI_SUMMARY_ENDPOINT = "https://en.wikipedia.org/api/rest_v1/page/summary/"
 
@@ -103,7 +104,9 @@ def should_exclude_description(description):
         return False
     return any(term.lower() in description.lower() for term in EXCLUDE_TERMS)
 
-def import_data(csv_file='nasa_exoplanet_data.csv'):
+def import_data(csv_file='src/data/nasa_exoplanet_data.csv'):
+
+    
     data = pd.read_csv(csv_file)
 
     # Parallel fetching of descriptions and images from Wikipedia summary
@@ -136,10 +139,23 @@ def import_data(csv_file='nasa_exoplanet_data.csv'):
     data = data.dropna(subset=['description'])
 
     # Connect to SQLite and write DataFrame in a batch
-    conn = sqlite3.connect('exoplanets.db')
+    conn = sqlite3.connect('src/data/exoplanets.db')
     data.to_sql('exoplanets', conn, if_exists='replace', index=False, chunksize=1000)
     conn.close()
     print("Data imported successfully with filtered Wikipedia summaries and thumbnail images.")
 
 if __name__ == "__main__":
+    # if not in root directory, throw an error
+    if os.path.dirname(__file__) != os.path.abspath('src'):
+        raise ValueError("This script must be run from the root directory, not src/")
+    
+    # if csv file does not exist, throw an error
+    if not os.path.exists('src/data/nasa_exoplanet_data.csv'):
+        raise ValueError("CSV file does not exist, did you run the download_data.py script?")
+    
+    # if database file does not exist, throw an error
+    if not os.path.exists('src/data/exoplanets.db'):
+        raise ValueError("Database file does not exist, did you run the database_setup.py script?")
+    
+    print("Importing data...")
     import_data()

@@ -1,7 +1,8 @@
 import sqlite3
+import os
 
 def create_database():
-    conn = sqlite3.connect('exoplanets.db')
+    conn = sqlite3.connect('src/data/exoplanets.db')
     cursor = conn.cursor()
 
     cursor.execute('''
@@ -28,5 +29,14 @@ def create_database():
     conn.close()
 
 if __name__ == "__main__":
+    # if not in root directory, throw an error
+    if os.path.dirname(__file__) != os.path.abspath('src'):
+        raise ValueError("This script must be run from the root directory, not src/")
+        
+    # if csv file does not exist, throw an error
+    if not os.path.exists('src/data/nasa_exoplanet_data.csv'):
+        raise ValueError("CSV file does not exist, did you run the download_data.py script?")
+    
+    print("Creating database and table...")
     create_database()
     print("Database and table created successfully.")

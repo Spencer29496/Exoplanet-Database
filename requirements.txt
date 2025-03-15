@@ -1,3 +1,6 @@
 requests
 tqdm
 pandas
+pyfiglet
+flask
+flask_paginate
