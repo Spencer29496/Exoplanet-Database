@@ -50,7 +50,7 @@ def fetch_exoplanets(offset=0, per_page=10, search_query=None):
     return df
 
 def get_total_count(search_query=None):
-    conn = sqlite3.connect('exoplanets.db')
+    conn = sqlite3.connect('src/data/exoplanets.db')
 
     exclude_patterns = [
         '%via.placeholder.com%',
@@ -124,7 +124,8 @@ def open_browser():
     webbrowser.get("C:/Program Files/Google/Chrome/Application/chrome.exe %s").open_new("http://127.0.0.1:5000/")
 
 if __name__ == "__main__":
-        # if not in root directory, throw an error
+    # if not in root directory, throw an error
+
     if os.path.dirname(__file__) != os.path.abspath('src'):
         raise ValueError("This script must be run from the root directory, not src/")
     

@@ -1,8 +1,6 @@
-Flask
-Flask-Paginate
-pandas
 requests
 tqdm
-sqlite3
-urllib3
-concurrent.futures
+pandas
+pyfiglet
+flask
+flask_paginate
