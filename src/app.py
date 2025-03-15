@@ -13,7 +13,7 @@ app = Flask(__name__)
 LIST_FIELDS = "pl_name, image_url"
 
 def fetch_exoplanets(offset=0, per_page=10, search_query=None):
-    conn = sqlite3.connect('exoplanets.db')
+    conn = sqlite3.connect('src/data/exoplanets.db')
 
     exclude_patterns = [
         '%via.placeholder.com%',
@@ -105,7 +105,7 @@ def exoplanet_detail(name):
     page = request.args.get('page', 1, type=int)
     search_query = request.args.get('search', '')
 
-    conn = sqlite3.connect('exoplanets.db')
+    conn = sqlite3.connect('src/data/exoplanets.db')
     query = "SELECT * FROM exoplanets WHERE pl_name = ?"
     df = pd.read_sql_query(query, conn, params=(name,))
     conn.close()
@@ -124,6 +124,10 @@ def open_browser():
     webbrowser.get("C:/Program Files/Google/Chrome/Application/chrome.exe %s").open_new("http://127.0.0.1:5000/")
 
 if __name__ == "__main__":
+        # if not in root directory, throw an error
+    if os.path.dirname(__file__) != os.path.abspath('src'):
+        raise ValueError("This script must be run from the root directory, not src/")
+    
     threading.Thread(target=open_browser).start()
     try:
         app.run(debug=True, use_reloader=False)
